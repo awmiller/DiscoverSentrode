@@ -109,7 +109,6 @@ public class NodeController {
                         sb.append(svs.getUuid().toString()).append("\r\n");
                     }
                 }
-
                 mReportView.setText(sb.toString());
             }
         }

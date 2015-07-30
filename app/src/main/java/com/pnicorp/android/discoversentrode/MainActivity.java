@@ -11,15 +11,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -183,7 +179,7 @@ public class MainActivity extends AppCompatActivity{
 
         private void startDeviceDisplay(String[] s) {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.RelLaymain,PunchProfileFragment.newInstance(s));
+        ft.replace(R.id.RelLaymain, NodeProfileFragment.newInstance(s));
         ft.addToBackStack("That");
         ft.commit();
 
@@ -192,7 +188,7 @@ public class MainActivity extends AppCompatActivity{
     }
     private void startDeviceDisplay(BluetoothDevice[] devices) {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.RelLaymain,PunchProfileFragment.newInstance(devices));
+        ft.replace(R.id.RelLaymain, NodeProfileFragment.newInstance(devices));
         ft.addToBackStack("That");
         ft.commit();
 

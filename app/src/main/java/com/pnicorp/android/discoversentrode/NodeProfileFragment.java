@@ -4,24 +4,22 @@ import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.os.ParcelUuid;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link PunchProfileFragment#newInstance} factory method to
+ * Use the {@link NodeProfileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PunchProfileFragment extends Fragment implements DeviceAdapter.OnCardClickedListener {
+public class NodeProfileFragment extends Fragment implements DeviceAdapter.OnCardClickedListener {
 
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mrLayoutManger;
@@ -40,8 +38,8 @@ public class PunchProfileFragment extends Fragment implements DeviceAdapter.OnCa
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static PunchProfileFragment newInstance(String[] devicenames) {
-        PunchProfileFragment fragment = new PunchProfileFragment();
+    public static NodeProfileFragment newInstance(String[] devicenames) {
+        NodeProfileFragment fragment = new NodeProfileFragment();
         fragment.setDeviceNames(devicenames);
         return fragment;
     }
@@ -50,13 +48,13 @@ public class PunchProfileFragment extends Fragment implements DeviceAdapter.OnCa
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static PunchProfileFragment newInstance(BluetoothDevice[] devices) {
-        PunchProfileFragment fragment = new PunchProfileFragment();
+    public static NodeProfileFragment newInstance(BluetoothDevice[] devices) {
+        NodeProfileFragment fragment = new NodeProfileFragment();
         fragment.setDevices(devices);
         return fragment;
     }
 
-    public PunchProfileFragment() {
+    public NodeProfileFragment() {
         // Required empty public constructor
     }
 
