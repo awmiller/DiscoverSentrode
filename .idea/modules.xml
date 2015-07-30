@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/DiscoverSentrode.iml" filepath="$PROJECT_DIR$/DiscoverSentrode.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PNI Logger Lib/PNI Logger Lib.iml" filepath="$PROJECT_DIR$/PNI Logger Lib/PNI Logger Lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PniUserInfoLibrary/PniUserInfoLibrary.iml" filepath="$PROJECT_DIR$/PniUserInfoLibrary/PniUserInfoLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+    </modules>
+  </component>
+</project>
