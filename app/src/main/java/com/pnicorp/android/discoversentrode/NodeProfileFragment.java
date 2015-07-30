@@ -26,6 +26,7 @@ public class NodeProfileFragment extends Fragment implements DeviceAdapter.OnCar
     private DeviceAdapter mrAdapter;
     private String[] mDeviceNames;
     private BluetoothDevice[] mBlueDevices;
+    private ArrayList<BluetoothDevice> mBlueDeviceList;
 
     public static final Integer[] BLUENRG_DEFAULT_DEVADDR = {0x02, 0x80, 0xE1, 0x00, 0x34, 0x12};
     public static final Integer[] BLUENRG_RIGHT_NODE_DEVADDR = {0x02, 0x80, 0xE1, 0x00, 0x34, 0x13};
@@ -61,6 +62,7 @@ public class NodeProfileFragment extends Fragment implements DeviceAdapter.OnCar
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mBlueDeviceList = new ArrayList<>();
     }
 
     @Override
@@ -73,7 +75,7 @@ public class NodeProfileFragment extends Fragment implements DeviceAdapter.OnCar
         mrLayoutManger = new LinearLayoutManager(getActivity());
 
         if (mrAdapter == null)
-            mrAdapter = new DeviceAdapter(mBlueDevices, this);
+            mrAdapter = new DeviceAdapter(mBlueDevices, this,getActivity());
 
         if ((mRecyclerView != null) && (mrLayoutManger != null)) {
             mRecyclerView.setHasFixedSize(true);
@@ -138,10 +140,14 @@ public class NodeProfileFragment extends Fragment implements DeviceAdapter.OnCar
     @Override
     public boolean onRecyclerCardClicked(View view, BluetoothDevice bdv) {
 
-        mNeutralNode = new NodeController(getActivity(),bdv);
-        mNeutralNode.setmReportView((TextView) view.findViewById(R.id.node_details));
+        //mBlueDeviceList.add(bdv);
 
         return false;
+    }
+
+    public void addDeviceToAdapter(BluetoothDevice BlueD)
+    {
+        mrAdapter.addDevice(BlueD);
     }
 
 

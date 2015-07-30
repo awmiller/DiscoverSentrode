@@ -17,10 +17,19 @@ public class DeviceViewHolder extends ViewHolder implements View.OnClickListener
     public CardView clickField;
     private BluetoothDevice mBlueDevice;
     private DeviceAdapter.OnCardClickedListener mReporter;
+    private NodeController mNodeC;
 
     @Override
     public void onClick(View v) {
-        mReporter.onRecyclerCardClicked(clickField,mBlueDevice);
+
+        if (!mNodeC.isBluetoothConnected()) {
+            mReporter.onRecyclerCardClicked(clickField, mBlueDevice);
+            mNodeC.startBlueConnection();
+        }
+        else
+        {
+            mNodeC.closeGatt();
+        }
     }
 
     public DeviceViewHolder(View itemView, DeviceAdapter.OnCardClickedListener repo) {
@@ -36,7 +45,22 @@ public class DeviceViewHolder extends ViewHolder implements View.OnClickListener
     }
 
     public void setBluetoothDevice(BluetoothDevice BDV) {
+
         this.mBlueDevice = BDV;
+
     }
+
+    public void setNodeController( NodeController nc)
+    {
+        mNodeC  = nc;
+        mNodeC.setmReportView(mNodeDetailsText);
+        mNodeC.startDiscoveryUpdate();
+    }
+
+    public boolean settingUpUUIDs()
+    {
+        return mNodeC.DiscoveryUpdating();
+    }
+
 
 }

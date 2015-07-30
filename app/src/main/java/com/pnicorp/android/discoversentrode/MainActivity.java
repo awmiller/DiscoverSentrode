@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity{
             Executors.newSingleThreadScheduledExecutor();
     private ArrayList<BluetoothDevice> mBleDevices = new ArrayList<>();
     final Timer BleTimeOut = new Timer();
-
+    private NodeProfileFragment mNodeProfileFragment;
     /**
      *
      * Widget management features
@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity{
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mrAdapter;
     private RecyclerView.LayoutManager mrLayoutManger;
+    private boolean mDisplayRunning=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +70,6 @@ public class MainActivity extends AppCompatActivity{
             BleTimeOut.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    mBluetoothAdapter.cancelDiscovery();
                     BleListDevices();
                 }
             },10000, 5000);
@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onStop() {
         super.onStop();
+        mBluetoothAdapter.cancelDiscovery();
     }
 
     @Override
@@ -157,10 +158,12 @@ public class MainActivity extends AppCompatActivity{
                 @Override
                 public void run() {
                     //null state used as a flag that this activity is not active
-                    if(mBluetoothAdapter!=null) {
-                        BleTimeOut.cancel();
+                    if((mBluetoothAdapter!=null)&&(!mDisplayRunning)) {
+                        //BleTimeOut.cancel();
                         startDeviceDisplay(mBleDevices.toArray(new BluetoothDevice[mBleDevices.size()]));
+                        mDisplayRunning = true;
                     }
+
                 }
             });
         }
@@ -169,7 +172,7 @@ public class MainActivity extends AppCompatActivity{
                 @Override
                 public void run() {
 
-                    Toast.makeText(MainActivity.this, "No Devices founds, restarting scan...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "No Devices found, restarting scan...", Toast.LENGTH_SHORT).show();
 
                     scanForDevices();
                 }
@@ -177,18 +180,13 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-        private void startDeviceDisplay(String[] s) {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.RelLaymain, NodeProfileFragment.newInstance(s));
-        ft.addToBackStack("That");
-        ft.commit();
 
-        findViewById(R.id.text).setVisibility(View.GONE);
-        findViewById(R.id.circle).setVisibility(View.GONE);
-    }
     private void startDeviceDisplay(BluetoothDevice[] devices) {
+
+        mNodeProfileFragment = NodeProfileFragment.newInstance(devices);
+
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.RelLaymain, NodeProfileFragment.newInstance(devices));
+        ft.replace(R.id.RelLaymain, mNodeProfileFragment);
         ft.addToBackStack("That");
         ft.commit();
 
@@ -209,7 +207,14 @@ public class MainActivity extends AppCompatActivity{
             {
                 BluetoothDevice mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                mBleDevices.add(mDevice);
+                if(mDisplayRunning)
+                {
+                    mNodeProfileFragment.addDeviceToAdapter(mDevice);
+                }
+                else
+                {
+                    mBleDevices.add(mDevice);
+                }
             }
         }
     }

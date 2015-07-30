@@ -24,7 +24,7 @@ public class NodeController {
     {
         mBlueDevice = device;
         mAppContext = ctx;
-        startBlueConnection(ctx);
+        //startBlueConnection(ctx);
     }
 
 
@@ -37,7 +37,7 @@ public class NodeController {
         mBlueDevice = device;
     }
 
-    public void startBlueConnection(Context ctx)
+    public void startBlueConnection()
     {
         if(mBlueGatt != null)
         {
@@ -45,7 +45,7 @@ public class NodeController {
             mBlueGatt.close();
             mBlueGatt=null;
         }
-        mBlueGatt = mBlueDevice.connectGatt(ctx,false,mBleCallbacks);
+        mBlueGatt = mBlueDevice.connectGatt(mAppContext,false,mBleCallbacks);
     }
 
     public void disconnectGatt()
@@ -60,9 +60,13 @@ public class NodeController {
     {
         if(mBlueGatt!=null)
         {
+            mBlueGatt.disconnect();
             mBlueGatt.close();
             mBlueGatt = null;
         }
+
+        BluetoothConnected = false;
+        BluetoothStreaming = false;
     }
 
     public boolean isBluetoothConnected() {
@@ -75,6 +79,7 @@ public class NodeController {
 
     private boolean BluetoothConnected;
     private boolean BluetoothStreaming;
+    private boolean DisconnectOnServiceDiscovery = false;
 
     private BluetoothGattCallback mBleCallbacks = new BluetoothGattCallback() {
         @Override
@@ -89,14 +94,13 @@ public class NodeController {
             else if(newState == BluetoothGatt.STATE_DISCONNECTED)
             {
                 closeGatt();
-                BluetoothConnected = false;
-                BluetoothStreaming = false;
             }
         }
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
+
             if(mReportView!=null)
             {
                 ArrayList<BluetoothGattService> ListServs
@@ -110,6 +114,12 @@ public class NodeController {
                     }
                 }
                 mReportView.setText(sb.toString());
+            }
+
+            if(DisconnectOnServiceDiscovery)
+            {
+                DisconnectOnServiceDiscovery = false;
+                closeGatt();
             }
         }
 
@@ -128,4 +138,14 @@ public class NodeController {
             super.onCharacteristicWrite(gatt, characteristic, status);
         }
     };
+
+    public boolean DiscoveryUpdating()
+    {
+        return DisconnectOnServiceDiscovery;
+    }
+
+    public void startDiscoveryUpdate() {
+        DisconnectOnServiceDiscovery = true;
+        startBlueConnection();
+    }
 }
