@@ -6,11 +6,14 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
+import android.os.ParcelUuid;
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 /**
+ * Contains methods to control device and automate gatt connection
  * Created by amiller on 7/24/2015.
  */
 public class NodeController {
@@ -19,12 +22,17 @@ public class NodeController {
     private BluetoothGatt mBlueGatt;
     private BluetoothDevice mBlueDevice;
     private TextView mReportView;
+    private boolean nodeSelected;
+
+
+    public boolean isNodeSelected(){return nodeSelected;}
+    protected void selectNode(boolean tf){nodeSelected=tf;}
 
     NodeController(Context ctx, BluetoothDevice device)
     {
         mBlueDevice = device;
         mAppContext = ctx;
-        //startBlueConnection(ctx);
+        mBlueDevice.fetchUuidsWithSdp();
     }
 
 
@@ -147,5 +155,47 @@ public class NodeController {
     public void startDiscoveryUpdate() {
         DisconnectOnServiceDiscovery = true;
         startBlueConnection();
+    }
+
+    /**
+     * Returns a string containing a concise, human-readable description of this
+     * object. Subclasses are encouraged to override this method and provide an
+     * implementation that takes into account the object's type and data. The
+     * default implementation is equivalent to the following expression:
+     * <pre>
+     *   getClass().getName() + '@' + Integer.toHexString(hashCode())</pre>
+     * <p>See <a href="{@docRoot}reference/java/lang/Object.html#writing_toString">Writing a useful
+     * {@code toString} method</a>
+     * if you intend implementing your own {@code toString} method.
+     *
+     * @return a printable representation of this object.
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb;
+        try {
+            sb = new StringBuilder(mBlueDevice.getName());
+
+            sb.append("\r\n").append(mBlueDevice.getAddress());
+
+            if(mBlueDevice.getUuids()!=null)
+            {
+                for(ParcelUuid puid : mBlueDevice.getUuids())
+                {
+                    sb.append(puid.getUuid().toString());
+                }
+            }
+
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+
+
+    }
+
+    public View getReportView() {
+        return mReportView;
     }
 }
