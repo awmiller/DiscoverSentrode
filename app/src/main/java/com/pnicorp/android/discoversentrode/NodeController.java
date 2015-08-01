@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Contains methods to control device and automate gatt connection
@@ -23,6 +25,18 @@ public class NodeController {
     private BluetoothDevice mBlueDevice;
     private TextView mReportView;
     private boolean nodeSelected;
+
+    private boolean hasSentralService;
+    private boolean hasNodeConfigService;
+
+    public static final UUID SENTRAL_SERVICE_UUID = UUID.fromString("f18472a8-3ff4-ffb9-522d-f86ff4ed9d50");
+
+    private ArrayList<BluetoothGattService> Services;
+
+    public final ArrayList<BluetoothGattService> getServices()
+    {
+        return Services;
+    }
 
 
     public boolean isNodeSelected(){return nodeSelected;}
@@ -43,6 +57,11 @@ public class NodeController {
     void setBluetoothDevice(BluetoothDevice device)
     {
         mBlueDevice = device;
+    }
+
+    BluetoothDevice getBluetoothDevice()
+    {
+        return this.mBlueDevice;
     }
 
     public void startBlueConnection()
@@ -109,20 +128,9 @@ public class NodeController {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
 
-            if(mReportView!=null)
-            {
-                ArrayList<BluetoothGattService> ListServs
-                        = (ArrayList<BluetoothGattService>) gatt.getServices();
-                StringBuilder sb = new StringBuilder(mBlueDevice.getAddress()+"\r\n");
-                if(ListServs!=null)
-                {
-                    for(BluetoothGattService svs : ListServs)
-                    {
-                        sb.append(svs.getUuid().toString()).append("\r\n");
-                    }
-                }
-                mReportView.setText(sb.toString());
-            }
+
+            Services.addAll(gatt.getServices());
+
 
             if(DisconnectOnServiceDiscovery)
             {

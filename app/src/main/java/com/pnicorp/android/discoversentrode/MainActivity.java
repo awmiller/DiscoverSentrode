@@ -1,5 +1,6 @@
 package com.pnicorp.android.discoversentrode;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
@@ -9,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Parcel;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -28,14 +30,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class MainActivity extends AppCompatActivity implements NodeControllerFragment.OnFragmentInteractionListener{
 
-    protected static final String[] APP_FRAGMENTS_BACKSTACK_STATES
-            =
-            {
-                    "NO_FRAGMETNS",
-                    "DISCOVERING_DEVICES",
-                    "EXPLORING_A_DEVICE",
-                    "USING_DEVICES"
-            };
+    protected static final String FRAGMENT_DISCOVERING_DEVICES = "wjbgf;awfj;alw.p3218fues90iqfm";
+    protected static final String FRAGMENT_EXPLORING_DEVICE = "aiufqjbk.af *A Wfajnk;a  sjbvge98p sue";
 
     /**
      * Bluetooth LE Locals
@@ -48,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements NodeControllerFra
     private LinkedHashSet<BluetoothDevice> mBleDevices = new LinkedHashSet<>();
     final Timer BleTimeOut = new Timer();
     private NodeProfileFragment mNodeProfileFragment;
+    NodeConfigureFragment mConfigFrag;
     /**
      *
      * Widget management features
@@ -58,6 +55,21 @@ public class MainActivity extends AppCompatActivity implements NodeControllerFra
     private boolean mDisplayRunning=false;
     private NodeControllerFragment mNodeContFrag;
 
+    /**
+     * Take care of popping the fragment back stack or finishing the activity
+     * as appropriate.
+     */
+    @Override
+    public void onBackPressed() {
+
+        //roll back to initial state.
+        FragmentManager fm = getFragmentManager();
+        if(fm.getBackStackEntryCount() < 1)
+            super.onBackPressed();
+        else
+            fm.popBackStack();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements NodeControllerFra
 
         IntentFilter itf = new IntentFilter();
         itf.addAction(BluetoothDevice.ACTION_FOUND);
+        itf.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         getApplication().registerReceiver(mBleBcReceiver, itf);
 
         // Ensures Bluetooth is available on the device and it is enabled. If not,
@@ -119,7 +132,12 @@ public class MainActivity extends AppCompatActivity implements NodeControllerFra
 
         //roll back to initial state.
         FragmentManager fm = getFragmentManager();
+        if(fm.findFragmentByTag(FRAGMENT_EXPLORING_DEVICE)!=null)
+            fm.popBackStackImmediate();
+        if(fm.findFragmentByTag(FRAGMENT_DISCOVERING_DEVICES)!=null)
+            fm.popBackStackImmediate();
         fm.popBackStackImmediate();
+
         super.onSaveInstanceState(outState);
     }
 
@@ -180,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements NodeControllerFra
                 public void run() {
                     BleListDevices();
                 }
-            }, 10000);
+            }, 5000);
         }
     }
 
@@ -217,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements NodeControllerFra
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.RelLaymain, mNodeContFrag);
-        ft.addToBackStack("That");
+        ft.addToBackStack(FRAGMENT_DISCOVERING_DEVICES);
         ft.commit();
 
         findViewById(R.id.text).setVisibility(View.GONE);
@@ -233,6 +251,8 @@ public class MainActivity extends AppCompatActivity implements NodeControllerFra
         //start a node action
         Toast.makeText(MainActivity.this, String.format("Device Clicked %s",clickedDevice.toString())
                 , Toast.LENGTH_SHORT).show();
+
+        startConfigFragment(clickedDevice);
     }
 
     @Override
@@ -273,7 +293,23 @@ public class MainActivity extends AppCompatActivity implements NodeControllerFra
                 }
 
             }
+
+            if(action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
+
+                safeDiscoveryStop();
+            }
         }
+    }
+
+    private void startConfigFragment(NodeController nodeC)
+    {
+        mConfigFrag = NodeConfigureFragment.newInstance(nodeC.getBluetoothDevice());
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.RelLaymain, mConfigFrag);
+        ft.addToBackStack(FRAGMENT_EXPLORING_DEVICE);
+        ft.commit();
+
+        mConfigFrag.setNodeController(nodeC);
     }
 
 

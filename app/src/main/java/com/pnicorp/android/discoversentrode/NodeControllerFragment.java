@@ -136,6 +136,7 @@ public class NodeControllerFragment extends Fragment implements AbsListView.OnIt
             mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar2);
 
         mProgressBar.setVisibility(View.VISIBLE);
+        mProgressBar.setMax(1000);
 
         progressAnimator.schedule(new TimerTask() {
             @Override
@@ -150,7 +151,7 @@ public class NodeControllerFragment extends Fragment implements AbsListView.OnIt
                     }
                 });
             }
-        },100,500);
+        },100,100);
 
         BackgroundDefaultColor = view.getDrawingCacheBackgroundColor();
 
@@ -193,8 +194,6 @@ public class NodeControllerFragment extends Fragment implements AbsListView.OnIt
             else {
                 // Notify the active callbacks interface (the activity, if the
                 // fragment is attached to one) that an item has been selected.
-                mListener.onItemClicked(nc);
-
                 if(mNodes.contains(nc))
                 {
                     NodeController popout = mNodes.pop();
@@ -212,6 +211,9 @@ public class NodeControllerFragment extends Fragment implements AbsListView.OnIt
                     nc.getReportView().setBackgroundColor(BackgroundSelectedColor);
                 }
 
+                progressAnimator.purge();
+                progressAnimator.cancel();
+                mListener.onItemClicked(nc);
                 /**
                  * Start device connection
                  *//**
